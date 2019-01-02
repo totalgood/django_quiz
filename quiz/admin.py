@@ -74,7 +74,7 @@ class MCQuestionAdmin(admin.ModelAdmin):
     search_fields = ('content', 'explanation')
     filter_horizontal = ('quiz',)
 
-    inlines = [AnswerInline]
+    # inlines = [AnswerInline]
 
 
 class ProgressAdmin(admin.ModelAdmin):
