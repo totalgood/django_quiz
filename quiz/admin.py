@@ -26,7 +26,7 @@ class QuizAdminForm(forms.ModelForm):
         exclude = []
 
     questions = forms.ModelMultipleChoiceField(
-        queryset=Question.objects.all().select_subclasses(),
+        queryset=Question.objects.all(),
         required=False,
         label=_("Questions"),
         widget=FilteredSelectMultiple(
@@ -37,7 +37,7 @@ class QuizAdminForm(forms.ModelForm):
         super(QuizAdminForm, self).__init__(*args, **kwargs)
         if self.instance.pk:
             self.fields['questions'].initial =\
-                self.instance.question_set.all().select_subclasses()
+                self.instance.question_set.all()
 
     def save(self, commit=True):
         quiz = super(QuizAdminForm, self).save(commit=False)

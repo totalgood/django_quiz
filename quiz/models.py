@@ -50,6 +50,7 @@ class SubCategory(models.Model):
 
     category = models.ForeignKey(
         Category, null=True, blank=True,
+        on_delete=models.deletion.CASCADE,
         verbose_name=_("Category"))
 
     objects = CategoryManager()
@@ -80,6 +81,7 @@ class Quiz(models.Model):
 
     category = models.ForeignKey(
         Category, null=True, blank=True,
+        on_delete=models.deletion.CASCADE,
         verbose_name=_("Category"))
 
     random_order = models.BooleanField(
@@ -157,7 +159,7 @@ class Quiz(models.Model):
         return self.title
 
     def get_questions(self):
-        return self.question_set.all().select_subclasses()
+        return self.question_set.all()
 
     @property
     def get_max_score(self):
@@ -190,7 +192,8 @@ class Progress(models.Model):
     Data stored in csv using the format:
         category, score, possible, category, score, possible, ...
     """
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("User"))
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("User"),
+        on_delete=models.deletion.CASCADE)
 
     score = models.CommaSeparatedIntegerField(max_length=1024,
                                               verbose_name=_("Score"))
@@ -306,11 +309,9 @@ class SittingManager(models.Manager):
     def new_sitting(self, user, quiz):
         if quiz.random_order is True:
             question_set = quiz.question_set.all() \
-                                            .select_subclasses() \
                                             .order_by('?')
         else:
-            question_set = quiz.question_set.all() \
-                                            .select_subclasses()
+            question_set = quiz.question_set.all()
 
         question_set = [item.id for item in question_set]
 
@@ -368,9 +369,11 @@ class Sitting(models.Model):
     with the answer the user gave.
     """
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"))
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("User"), 
+        on_delete=models.deletion.CASCADE)
 
-    quiz = models.ForeignKey(Quiz, verbose_name=_("Quiz"))
+    quiz = models.ForeignKey(Quiz, verbose_name=_("Quiz"),
+        on_delete=models.deletion.CASCADE)
 
     question_order = models.CommaSeparatedIntegerField(
         max_length=1024, verbose_name=_("Question Order"))
@@ -500,8 +503,7 @@ class Sitting(models.Model):
     def get_questions(self, with_answers=False):
         question_ids = self._question_ids()
         questions = sorted(
-            self.quiz.question_set.filter(id__in=question_ids)
-                                  .select_subclasses(),
+            self.quiz.question_set.filter(id__in=question_ids),
             key=lambda q: question_ids.index(q.id))
 
         if with_answers:
@@ -544,11 +546,13 @@ class Question(models.Model):
 
     category = models.ForeignKey(Category,
                                  verbose_name=_("Category"),
+                                 on_delete=models.deletion.CASCADE,
                                  blank=True,
                                  null=True)
 
     sub_category = models.ForeignKey(SubCategory,
                                      verbose_name=_("Sub-Category"),
+                                     on_delete=models.deletion.CASCADE,
                                      blank=True,
                                      null=True)
 

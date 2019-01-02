@@ -338,8 +338,7 @@ class QuizTake(FormView):
 
         if self.quiz.answers_at_end:
             results['questions'] = sorted(
-                self.quiz.question_set.filter(id__in=q_order)
-                                      .select_subclasses(),
+                self.quiz.question_set.filter(id__in=q_order),
                 key=lambda q: q_order.index(q.id))
 
             results['incorrect_questions'] = (
